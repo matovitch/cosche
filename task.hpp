@@ -9,7 +9,7 @@
 #include "abstract_task.hpp"
 #include "scheduler.hpp"
 
-template<class Ret, class... Args>
+template<class Rt>
 class Task : public AbstractTask
 {
 
@@ -17,13 +17,13 @@ public:
 
     Task(Scheduler& scheduler) :
         AbstractTask(scheduler),
-        _task(std::make_shared<std::packaged_task<Ret(Args...)>>())
+        _task(std::make_shared<std::packaged_task<Rt()>>())
     {}
 
-    template <class Fn>
+    template <class Fn, class... Args>
     auto operator()(Fn&& fn, Args&&... args)
     {
-        *_task = std::packaged_task<Ret()>(std::bind(fn, args...));
+        *_task = std::packaged_task<Rt()>(std::bind(fn, args...));
 
         return _task->get_future();
     }
@@ -43,7 +43,7 @@ public:
 
 private:
 
-    std::shared_ptr<std::packaged_task<Ret(Args...)>> _task;
+    std::shared_ptr<std::packaged_task<Rt()>> _task;
 };
 
 

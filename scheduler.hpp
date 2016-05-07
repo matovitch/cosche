@@ -10,7 +10,7 @@
 class AbstractTask;
 class AbstractFuture;
 
-template <class Ret, class... Args>
+template <class Rt>
 class Task;
 
 class Scheduler : private Toposort<TaskNode, TaskNodeHasher>
@@ -22,17 +22,17 @@ public:
 
     Scheduler() : _running(false) {}
 
-    template <class Ret, class... Args>
-    Task<Ret, Args...>& getNewTask()
+    template <class Rt>
+    Task<Rt>& getNewTask()
     {
         _tasks.emplace_back
         (
-            std::make_unique<Task<Ret, Args...>>(*this)
+            std::make_unique<Task<Rt>>(*this)
         );
 
         push(_tasks.back().get());
 
-        return static_cast<Task<Ret, Args...>&>(*(_tasks.back()));
+        return static_cast<Task<Rt>&>(*(_tasks.back()));
     }
 
     void run();
