@@ -2,10 +2,11 @@
 #define __ABSTRACT_FUTURE_H__
 
 #include <future>
+#include <chrono>
 
 struct AbstractFuture
 {
-    virtual bool valid() const = 0;
+    virtual bool ready() const = 0;
 };
 
 template <typename T>
@@ -13,7 +14,11 @@ struct Future : std::future<T>, AbstractFuture
 {
     Future(std::future<T>&& future) : std::future<T>(std::move(future)) {}
 
-    bool valid() const { return std::future<T>::valid(); }
+    bool ready() const
+    {
+        return std::future<T>::wait_for(std::chrono::seconds(0)) ==
+               std::future_status::ready;
+    }
 };
 
 #endif

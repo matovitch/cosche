@@ -4,10 +4,10 @@
 #include <iostream>
 #include <future>
 #include <thread>
+#include <chrono>
 
 int main()
 {
-
     Scheduler scheduler;
 
     auto ping = scheduler.getNewTask<void>();
@@ -26,6 +26,7 @@ int main()
 
             std::packaged_task<void()> task([]()
             {
+                std::this_thread::sleep_for(std::chrono::seconds(2));
                 std::cout << "task" << std::endl;
             });
 
@@ -35,9 +36,9 @@ int main()
 
             ping.wait(std::move(future));
 
-            thread.join();
-
             std::cout << "ping" << std::endl;
+
+            thread.join();
         }
     );
 

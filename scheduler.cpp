@@ -12,10 +12,14 @@ void Scheduler::run()
 
     AbstractTask* task;
 
-    while (!empty())
+    while (!empty() || waiting())
     {
-        task = top()._task;
-        (*task->_context) = std::get<0>((*(task->_context))(task));
+        if (!empty())
+        {
+            task = top()._task;
+            (*task->_context) = std::get<0>((*(task->_context))(task));
+        }
+
         checkFutures();
     }
 
@@ -28,9 +32,10 @@ void Scheduler::checkFutures()
 
     while (it != _futures.end())
     {
-        if (it->first->valid())
+        if (it->first->ready())
         {
             wake(it->second);
+            _future = it->first;
             it = _futures.erase(it);
         }
         else
@@ -40,7 +45,7 @@ void Scheduler::checkFutures()
     }
 }
 
-void Scheduler::haltWaitingFuture(std::unique_ptr<AbstractFuture>&& future,
+void Scheduler::haltWaitingFuture(std::shared_ptr<AbstractFuture>&& future,
                                   AbstractTask* task)
 {
     halt(task);

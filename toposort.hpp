@@ -185,7 +185,8 @@ struct Toposort
           T&  top()       { return (*(_pendings.begin()))->_t; }
     const T& ctop() const { return (*(_pendings.begin()))->_t; }
 
-    bool empty() const { return _pendings.empty() && _waitings.empty(); }
+    bool   empty() const { return _pendings.empty(); }
+    bool waiting() const { return !_waitings.empty(); }
 
     bool cyclic() const
     {

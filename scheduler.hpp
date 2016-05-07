@@ -41,12 +41,14 @@ private:
 
     void checkFutures();
 
-    void haltWaitingFuture(std::unique_ptr<AbstractFuture>&& future,
+    void haltWaitingFuture(std::shared_ptr<AbstractFuture>&& future,
                            AbstractTask* task);
 
     bool _running;
     std::vector<std::unique_ptr<AbstractTask>> _tasks;
-    std::unordered_map<std::unique_ptr<AbstractFuture>, AbstractTask*> _futures;
+
+    std::shared_ptr<AbstractFuture> _future;
+    std::unordered_map<std::shared_ptr<AbstractFuture>, AbstractTask*> _futures;
 };
 
 #endif // __SCHEDULER_H__

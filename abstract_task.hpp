@@ -39,24 +39,13 @@ public:
     {
         if (_scheduler._running)
         {
-            _scheduler.haltWaitingFuture(std::make_unique<Future<T>>(std::move(future)),
+            _scheduler.haltWaitingFuture(std::make_shared<Future<T>>(std::move(future)),
                                          this);
 
             *_context = std::get<0>((*_context)(this));
         }
 
-        return future.get();
-    }
-
-    void wait(std::future<void>&& future)
-    {
-        if (_scheduler._running)
-        {
-            _scheduler.haltWaitingFuture(std::make_unique<Future<void>>(std::move(future)),
-                                         this);
-
-            *_context = std::get<0>((*_context)(this));
-        }
+        return static_cast<Future<T>&>(*(_scheduler._future)).get();
     }
 
     static Context start(Context context, AbstractTask* task);
