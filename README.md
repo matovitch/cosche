@@ -1,8 +1,4 @@
 # cosche
-A dependency-based coroutine scheduler
-
-
-Cosche
 
 ### Disclaimer
 
