@@ -35,7 +35,7 @@ void Scheduler::checkFutures()
         if (it->first->ready())
         {
             wake(it->second);
-            _future = it->first;
+            it->second->_future = it->first;
             it = _futures.erase(it);
         }
         else

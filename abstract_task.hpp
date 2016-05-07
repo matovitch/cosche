@@ -45,13 +45,14 @@ public:
             *_context = std::get<0>((*_context)(this));
         }
 
-        return static_cast<Future<T>&>(*(_scheduler._future)).get();
+        return static_cast<Future<T>&>(*_future).get();
     }
 
     static Context start(Context context, AbstractTask* task);
 
 private:
 
+    std::shared_ptr<AbstractFuture> _future;
     std::shared_ptr<Context> _context;
     Scheduler& _scheduler;
 };

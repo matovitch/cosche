@@ -46,8 +46,6 @@ private:
 
     bool _running;
     std::vector<std::unique_ptr<AbstractTask>> _tasks;
-
-    std::shared_ptr<AbstractFuture> _future;
     std::unordered_map<std::shared_ptr<AbstractFuture>, AbstractTask*> _futures;
 };
 
