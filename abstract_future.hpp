@@ -13,7 +13,7 @@ struct Future : std::future<T>, AbstractFuture
 {
     Future(std::future<T>&& future) : std::future<T>(std::move(future)) {}
 
-    bool valid() const { return valid(); }
+    bool valid() const { return std::future<T>::valid(); }
 };
 
 #endif

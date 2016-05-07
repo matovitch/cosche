@@ -2,6 +2,8 @@
 #include "task.hpp"
 
 #include <iostream>
+#include <future>
+#include <thread>
 
 int main()
 {
@@ -21,6 +23,20 @@ int main()
             std::cout << "ping" << std::endl;
             pong.detach(ping);
             ping.attach(pong);
+
+            std::packaged_task<void()> task([]()
+            {
+                std::cout << "task" << std::endl;
+            });
+
+            auto future = task.get_future();
+
+            std::thread thread(std::move(task));
+
+            ping.wait(std::move(future));
+
+            thread.join();
+
             std::cout << "ping" << std::endl;
         }
     );

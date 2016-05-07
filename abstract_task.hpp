@@ -48,6 +48,17 @@ public:
         return future.get();
     }
 
+    void wait(std::future<void>&& future)
+    {
+        if (_scheduler._running)
+        {
+            _scheduler.haltWaitingFuture(std::make_unique<Future<void>>(std::move(future)),
+                                         this);
+
+            *_context = std::get<0>((*_context)(this));
+        }
+    }
+
     static Context start(Context context, AbstractTask* task);
 
 private:
