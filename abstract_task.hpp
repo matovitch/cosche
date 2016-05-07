@@ -4,9 +4,12 @@
 #include <boost/context/execution_context.hpp>
 #include <utility>
 #include <memory>
+#include <future>
 
-struct Scheduler;
-struct AbstractTask;
+#include "abstract_future.hpp"
+#include "scheduler.hpp"
+
+class AbstractTask;
 
 typedef boost::context::execution_context<AbstractTask*> Context;
 
@@ -31,6 +34,20 @@ public:
 
     void attach(AbstractTask& task);
 
+    template <class T>
+    T wait(std::future<T>&& future)
+    {
+        if (_scheduler._running)
+        {
+            _scheduler.haltWaitingFuture(std::make_unique<Future<T>>(std::move(future)),
+                                         this);
+
+            *_context = std::get<0>((*_context)(this));
+        }
+
+        return future.get();
+    }
+
     static Context start(Context context, AbstractTask* task);
 
 private:
@@ -38,7 +55,5 @@ private:
     std::shared_ptr<Context> _context;
     Scheduler& _scheduler;
 };
-
-
 
 #endif // __ABSTRACT_TASK_H__

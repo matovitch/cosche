@@ -1,17 +1,21 @@
 #ifndef __SCHEDULER_H__
 #define __SCHEDULER_H__
 
+#include <unordered_map>
 #include <memory>
-#include <utility>
-#include <tuple>
 
-#include "abstract_task.hpp"
 #include "task_node.hpp"
 #include "toposort.hpp"
-#include "task.hpp"
+
+class AbstractTask;
+class AbstractFuture;
+
+template <class Ret, class... Args>
+class Task;
 
 class Scheduler : private Toposort<TaskNode, TaskNodeHasher>
 {
+
     friend AbstractTask;
 
 public:
@@ -23,7 +27,7 @@ public:
     {
         _tasks.emplace_back
         (
-            std::make_shared<Task<Ret, Args...>>(*this)
+            std::make_unique<Task<Ret, Args...>>(*this)
         );
 
         push(_tasks.back().get());
@@ -31,26 +35,18 @@ public:
         return static_cast<Task<Ret, Args...>&>(*(_tasks.back()));
     }
 
-    void run()
-    {
-        _running = true;
-
-
-        AbstractTask* task;
-
-        while (!empty())
-        {
-            task = top()._task;
-            (*task->_context) = std::get<0>((*(task->_context))(task));
-        }
-
-        _running = false;
-    }
+    void run();
 
 private:
 
+    void checkFutures();
+
+    void haltWaitingFuture(std::unique_ptr<AbstractFuture>&& future,
+                           AbstractTask* task);
+
     bool _running;
-    std::vector<std::shared_ptr<AbstractTask>> _tasks;
+    std::vector<std::unique_ptr<AbstractTask>> _tasks;
+    std::unordered_map<std::unique_ptr<AbstractFuture>, AbstractTask*> _futures;
 };
 
 #endif // __SCHEDULER_H__

@@ -21,14 +21,12 @@ Context AbstractTask::start(Context context, AbstractTask* task)
 
 void AbstractTask::detach(AbstractTask& task)
 {
-    _scheduler.detach(this,
-                      &task);
+    _scheduler.detach(this, &task);
 }
 
 void AbstractTask::attach(AbstractTask& task)
 {
-    _scheduler.attach(this,
-                      &task);
+    _scheduler.attach(this, &task);
 
     if (_scheduler._running)
     {

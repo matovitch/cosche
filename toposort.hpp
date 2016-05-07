@@ -25,8 +25,6 @@ struct Node
 {
     Node(const T& t) : _t(t) {}
 
-    Node(T&& t) : _t(std::move(t)) {}
-
     T _t;
 
     NodePtrSet<Node<T, H>*, H> _ins;
@@ -70,38 +68,7 @@ struct Toposort
         _heap.insert(std::move(node));
     }
 
-    template <typename... Args>
-    void emplace(Args&&... args)
-    {
-        std::unique_ptr<Node<T, H>> node(std::make_unique<Node<T, H>>(T(args...)));
-        _pendings.insert(&(*node));
-        _heap.insert(std::move(node));
-    }
-
-    void attach(const T& lhs, 
-                const T& rhs)
-    {
-        auto lfit = _heap.find(std::make_unique<Node<T, H>>(lhs));
-        auto rfit = _heap.find(std::make_unique<Node<T, H>>(rhs));
-
-        if (lfit != _heap.end() &&
-            rfit != _heap.end())
-        {
-            Node<T, H>* lhsNode = &(*(*lfit));
-            Node<T, H>* rhsNode = &(*(*rfit));
-
-            lhsNode->_ins.insert(rhsNode);
-            rhsNode->_outs.insert(lhsNode);
-
-            if (_pendings.find(lhsNode) != _pendings.end())
-            {
-                _blockeds.insert(lhsNode);
-                _pendings.erase(lhsNode);
-            }
-        }
-    }
-
-    void detach(const T& lhs, 
+    void detach(const T& lhs,
                 const T& rhs)
     {
         auto lfit = _heap.find(std::make_unique<Node<T, H>>(lhs));
@@ -116,7 +83,8 @@ struct Toposort
             lhsNode->_ins.erase(rhsNode);
             rhsNode->_outs.erase(lhsNode);
 
-            if (lhsNode->_ins.empty())
+            if (lhsNode->_ins.empty() &&
+                _waitings.find(lhsNode) == _waitings.end())
             {
                 _blockeds.erase(lhsNode);
                 _pendings.insert(lhsNode);
@@ -124,10 +92,29 @@ struct Toposort
         }
     }
 
-          T&  top()       { return (*(_pendings.begin()))->_t; }
-    const T& ctop() const { return (*(_pendings.begin()))->_t; }
+    void attach(const T& lhs,
+                const T& rhs)
+    {
+        auto lfit = _heap.find(std::make_unique<Node<T, H>>(lhs));
+        auto rfit = _heap.find(std::make_unique<Node<T, H>>(rhs));
 
-    bool empty() const { return _pendings.empty(); }
+        if (lfit != _heap.end() &&
+            rfit != _heap.end())
+        {
+            Node<T, H>* lhsNode = &(*(*lfit));
+            Node<T, H>* rhsNode = &(*(*rfit));
+
+            if (lhsNode->_ins.empty() &&
+                _waitings.find(lhsNode) == _waitings.end())
+            {
+                _blockeds.insert(lhsNode);
+                _pendings.erase(lhsNode);
+            }
+
+            lhsNode->_ins.insert(rhsNode);
+            rhsNode->_outs.insert(lhsNode);
+        }
+    }
 
     void erase(const T& t)
     {
@@ -158,6 +145,47 @@ struct Toposort
             _heap.erase(std::make_unique<Node<T, H>>(*top));
         }
     }
+
+    void halt(const T& t)
+    {
+        auto fit = _heap.find(std::make_unique<Node<T, H>>(t));
+
+        if (fit != _heap.end())
+        {
+            Node<T, H>* tNode = &(*(*fit));
+
+            _waitings.insert(tNode);
+
+            if (tNode->_ins.empty())
+            {
+                _blockeds.insert(tNode);
+                _pendings.erase(tNode);
+            }
+        }
+    }
+
+    void wake(const T& t)
+    {
+        auto fit = _heap.find(std::make_unique<Node<T, H>>(t));
+
+        if (fit != _heap.end())
+        {
+            Node<T, H>* tNode = &(*(*fit));
+
+            _waitings.erase(tNode);
+
+            if (tNode->_ins.empty())
+            {
+                _blockeds.erase(tNode);
+                _pendings.insert(tNode);
+            }
+        }
+    }
+
+          T&  top()       { return (*(_pendings.begin()))->_t; }
+    const T& ctop() const { return (*(_pendings.begin()))->_t; }
+
+    bool empty() const { return _pendings.empty(); }
 
     bool cyclic() const
     {
@@ -193,6 +221,7 @@ struct Toposort
 
     NodePtrSet<Node<T, H>*, H> _pendings;
     NodePtrSet<Node<T, H>*, H> _blockeds;
+    NodePtrSet<Node<T, H>*, H> _waitings;
 
     NodePtrSet<std::unique_ptr<Node<T, H>>, H, NodePtrEquals<T, H>> _heap;
 

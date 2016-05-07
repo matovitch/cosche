@@ -1,4 +1,6 @@
 #include "scheduler.hpp"
+#include "task.hpp"
+
 #include <iostream>
 
 int main()
