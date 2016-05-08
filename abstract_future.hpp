@@ -12,7 +12,7 @@ struct AbstractFuture
     virtual bool ready() const = 0;
 };
 
-template <typename T>
+template <class T>
 struct Future : std::future<T>, AbstractFuture 
 {
     Future(std::future<T>&& future) : std::future<T>(std::move(future)) {}
@@ -22,6 +22,24 @@ struct Future : std::future<T>, AbstractFuture
         return std::future<T>::wait_for(std::chrono::seconds(0)) ==
                std::future_status::ready;
     }
+};
+
+template <class T>
+struct ScopedFuture : std::future<T>, AbstractFuture
+{
+    template <class Rep, class Period>
+    ScopedFuture(std::future<T>&& future, 
+                 const std::chrono::duration<Rep,Period>& timeoutDuration) :
+        std::future<T>(std::move(future)),
+        _timeout(std::chrono::steady_clock::now() + timeoutDuration) {}
+
+    bool ready() const
+    {
+        return std::future<T>::wait_for  (std::chrono::seconds(0)) == std::future_status::ready ||
+               std::chrono::steady_clock::now() > _timeout;
+    }
+
+    const std::chrono::steady_clock::time_point _timeout;
 };
 
 } // end cosche namespace

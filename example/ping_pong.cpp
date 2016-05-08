@@ -27,7 +27,7 @@ int main()
 
             std::packaged_task<void()> task([]()
             {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(2));
                 std::cout << "task" << std::endl;
             });
 
@@ -37,7 +37,7 @@ int main()
 
             ping.attach(pong);
 
-            ping.wait(std::move(future));
+            ping.waitFor(std::chrono::seconds(1), std::move(future));
 
             std::cout << "ping" << std::endl;
 

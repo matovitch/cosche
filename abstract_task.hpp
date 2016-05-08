@@ -61,13 +61,33 @@ public:
     {
         if (_scheduler._running)
         {
-            _scheduler.haltWaitingFuture(std::make_shared<Future<T>>(std::move(future)),
-                                         this);
+            _scheduler.haltWaitingFuture(
+                std::make_shared<Future<T>>(std::move(future)),
+                this);
 
             *_context = std::get<0>((*_context)(this));
         }
 
         return static_cast<Future<T>&>(*_future).get();
+    }
+
+    template <class Rep, class Period, class T>
+    std::future<T>& waitFor(const std::chrono::duration<Rep,Period>& timeoutDuration,
+                             std::future<T>&& future)
+    {
+        if (_scheduler._running)
+        {
+            _scheduler.haltWaitingFuture(
+                std::make_shared<ScopedFuture<T>>(std::move(future),
+                                                  timeoutDuration),
+                this);
+
+            *_context = std::get<0>((*_context)(this));
+        }
+
+        return static_cast<std::future<T>&>(
+                   static_cast<ScopedFuture<T>&>(*_future)
+               );
     }
 
     static Context start(Context context, AbstractTask* task);
