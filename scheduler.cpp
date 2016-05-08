@@ -1,15 +1,17 @@
 #include "scheduler.hpp"
 
-#include "abstract_future.hpp"
 #include "abstract_task.hpp"
+#include "future.hpp"
 #include "cycle.hpp"
 
-#include <stdexcept>
+#include <exception>
 #include <utility>
 #include <tuple>
 
 namespace cosche
 {
+
+Scheduler::Scheduler() : _running(false) {}
 
 void Scheduler::run()
 {
@@ -35,6 +37,8 @@ void Scheduler::run()
 
     _running = false;
 }
+
+bool Scheduler::running() const { return _running; }
 
 void Scheduler::checkFutures()
 {

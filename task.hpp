@@ -1,14 +1,11 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
-#include <functional>
-#include <iostream>
-#include <utility>
-#include <future>
-#include <tuple>
-
 #include "abstract_task.hpp"
 #include "scheduler.hpp"
+
+#include <functional>
+#include <future>
 
 namespace cosche
 {

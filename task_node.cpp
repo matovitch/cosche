@@ -5,6 +5,10 @@
 namespace cosche
 {
 
+TaskNode::TaskNode(AbstractTask* task) : _task(task) {}
+
+TaskNode::operator AbstractTask*() const { return _task; }
+
 bool operator==(const TaskNode& lhs,
                 const TaskNode& rhs)
 {

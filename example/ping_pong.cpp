@@ -37,6 +37,7 @@ int main()
 
             ping.attach(pong);
 
+            //ping.wait(std::move(future));
             ping.waitFor(std::chrono::seconds(1), std::move(future));
 
             std::cout << "ping" << std::endl;

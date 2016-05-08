@@ -16,14 +16,14 @@ class AbstractFuture;
 template <class Rt>
 class Task;
 
-class Scheduler : private Toposort<TaskNode, TaskNodeHasher>
+class Scheduler : Toposort<TaskNode, TaskNodeHasher>
 {
 
     friend AbstractTask;
 
 public:
 
-    Scheduler() : _running(false) {}
+    Scheduler();
 
     template <class Rt>
     Task<Rt>& getNewTask()
@@ -42,14 +42,16 @@ public:
 
 private:
 
+    bool running() const;
+
     void checkFutures();
 
     void haltWaitingFuture(std::shared_ptr<AbstractFuture>&& future,
                            AbstractTask* task);
 
-    bool _running;
-    std::vector<std::shared_ptr<AbstractTask>> _tasks;
     std::unordered_map<std::shared_ptr<AbstractFuture>, AbstractTask*> _futures;
+    std::vector<std::shared_ptr<AbstractTask>>                           _tasks;
+    bool                                                               _running;
 };
 
 } // end cosche namespace

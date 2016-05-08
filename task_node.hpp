@@ -10,9 +10,9 @@ class AbstractTask;
 
 struct TaskNode
 {
-    TaskNode(AbstractTask* task) : _task(task) {}
+    TaskNode(AbstractTask* task);
 
-    operator AbstractTask*() const { return _task; }
+    operator AbstractTask*() const;
 
     AbstractTask* _task;
 };

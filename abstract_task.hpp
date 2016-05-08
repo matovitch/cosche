@@ -2,13 +2,12 @@
 #define __ABSTRACT_TASK_H__
 
 #include <boost/context/execution_context.hpp>
-#include <iostream>
 #include <utility>
 #include <memory>
 #include <future>
 
-#include "abstract_future.hpp"
 #include "scheduler.hpp"
+#include "future.hpp"
 
 namespace cosche
 {
@@ -24,17 +23,7 @@ class AbstractTask
 
 public:
 
-    AbstractTask(Scheduler& scheduler) : 
-        _context(std::make_shared<Context>(start)),
-        _scheduler(scheduler),
-        _onCycle(std::make_shared<std::packaged_task<void()>>
-        (
-            [&]()
-            {
-                std::cerr << "The task " << id() << "belongs to a cycle." << std::endl;
-            }
-        ))
-    {}
+    AbstractTask(Scheduler& scheduler);
 
     AbstractTask(Scheduler&& scheduler) = delete;
 
@@ -59,7 +48,7 @@ public:
     template <class T>
     T wait(std::future<T>&& future)
     {
-        if (_scheduler._running)
+        if (_scheduler.running())
         {
             _scheduler.haltWaitingFuture(
                 std::make_shared<Future<T>>(std::move(future)),
@@ -73,9 +62,9 @@ public:
 
     template <class Rep, class Period, class T>
     std::future<T>& waitFor(const std::chrono::duration<Rep,Period>& timeoutDuration,
-                             std::future<T>&& future)
+                            std::future<T>&& future)
     {
-        if (_scheduler._running)
+        if (_scheduler.running())
         {
             _scheduler.haltWaitingFuture(
                 std::make_shared<ScopedFuture<T>>(std::move(future),
@@ -94,10 +83,9 @@ public:
 
 private:
 
-    std::shared_ptr<AbstractFuture> _future;
-    std::shared_ptr<Context> _context;
-    Scheduler& _scheduler;
-
+    Scheduler&                                _scheduler;
+    std::shared_ptr<Context>                    _context;
+    std::shared_ptr<AbstractFuture>              _future;
     std::shared_ptr<std::packaged_task<void()>> _onCycle;
 };
 

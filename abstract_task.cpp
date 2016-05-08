@@ -2,12 +2,25 @@
 
 #include "scheduler.hpp"
 
-#include <exception>
+#include <iostream>
 #include <utility>
+#include <future>
 #include <tuple>
 
 namespace cosche
 {
+
+AbstractTask::AbstractTask(Scheduler& scheduler) :
+    _scheduler(scheduler),
+    _context(std::make_shared<Context>(start)),
+    _onCycle(std::make_shared<std::packaged_task<void()>>
+    (
+        [&]()
+        {
+            std::cerr << "The task " << id() << " belongs to a cycle." << std::endl;
+        }
+    ))
+{}
 
 Context AbstractTask::start(Context context, AbstractTask* task)
 {
@@ -26,7 +39,7 @@ void AbstractTask::attach(AbstractTask& task)
 {
     _scheduler.attach(this, &task);
 
-    if (_scheduler._running)
+    if (_scheduler.running())
     {
         *_context = std::get<0>((*_context)(this));
     }

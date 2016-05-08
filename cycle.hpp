@@ -1,25 +1,19 @@
 #ifndef __CYCLE_H__
 #define __CYCLE_H__
 
-#include "abstract_task.hpp"
 #include "task_node.hpp"
 
 #include <exception>
+#include <vector>
 
 namespace cosche
 {
 
 struct Cycle : std::exception
 {
-    Cycle(const std::vector<TaskNode>& cycle) : _cycle(cycle) {}
+    Cycle(const std::vector<TaskNode>& cycle);
 
-    void operator()() const
-    {
-        for (auto& node : _cycle)
-        {
-            node._task->onCycle();
-        }
-    }
+    void operator()() const;
 
     std::vector<TaskNode> _cycle;
 };
