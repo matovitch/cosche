@@ -212,7 +212,7 @@ struct Toposort
 
     bool cyclic() const
     {
-        return empty() && !_blockeds.empty();
+        return empty() && !waiting() && !_blockeds.empty();
     }
 
     const std::vector<T>& cycle()
