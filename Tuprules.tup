@@ -17,3 +17,8 @@ CFLAGS += -I $(ROOT)/context/include
 CFLAGS += -I $(ROOT)/RobinHoodHashtable
 
 !cc = |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
+
+OBJ  = $(ROOT)/*.o
+OBJ += $(ROOT)/context/src/*.o
+OBJ += $(ROOT)/context/src/asm/*.o
+OBJ += $(ROOT)/context/src/posix/*.o
