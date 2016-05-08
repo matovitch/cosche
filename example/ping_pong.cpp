@@ -8,7 +8,7 @@
 
 int main()
 {
-    Scheduler scheduler;
+    cosche::Scheduler scheduler;
 
     auto ping = scheduler.getNewTask<void>();
     auto pong = scheduler.getNewTask<void>();
@@ -21,18 +21,19 @@ int main()
             pong.detach(ping);
             ping.attach(pong);
             std::cout << "ping" << std::endl;
-            pong.detach(ping);
-            ping.attach(pong);
+            ping.release();
 
             std::packaged_task<void()> task([]()
             {
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                std::this_thread::sleep_for(std::chrono::seconds(1));
                 std::cout << "task" << std::endl;
             });
 
             auto future = task.get_future();
 
             std::thread thread(std::move(task));
+
+            ping.attach(pong);
 
             ping.wait(std::move(future));
 

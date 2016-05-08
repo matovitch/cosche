@@ -4,6 +4,9 @@
 #include <future>
 #include <chrono>
 
+namespace cosche
+{
+
 struct AbstractFuture
 {
     virtual bool ready() const = 0;
@@ -20,5 +23,7 @@ struct Future : std::future<T>, AbstractFuture
                std::future_status::ready;
     }
 };
+
+} // end cosche namespace
 
 #endif

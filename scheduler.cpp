@@ -6,6 +6,9 @@
 #include <utility>
 #include <tuple>
 
+namespace cosche
+{
+
 void Scheduler::run()
 {
     _running = true;
@@ -51,3 +54,5 @@ void Scheduler::haltWaitingFuture(std::shared_ptr<AbstractFuture>&& future,
     halt(task);
     _futures[std::move(future)] = task;
 }
+
+} // end cosche namespace

@@ -8,6 +8,9 @@
 
 #include "RobinHoodHashtable.hpp"
 
+namespace cosche
+{
+
 template <typename N, typename H>
 struct NodePtrHasher
 {
@@ -135,14 +138,33 @@ struct Toposort
                 }
             }
 
-            for (Node<T, H>* const in : top->_ins)
-            {
-                in->_outs.erase(top);
-            }
-
             _pendings.erase(top);
             _blockeds.erase(top);
             _heap.erase(std::make_unique<Node<T, H>>(*top));
+        }
+    }
+
+    void release(const T& t)
+    {
+        auto fit = _heap.find(std::make_unique<Node<T, H>>(t));
+
+        if (fit != _heap.end())
+        {
+            Node<T, H>* const top = &(*(*fit));
+
+            for (Node<T, H>* const out : top->_outs)
+            {
+                out->_ins.erase(top);
+
+                if (out->_ins.empty() &&
+                    _waitings.find(out) == _waitings.end())
+                {
+                    _blockeds.erase(out);
+                    _pendings.insert(out);
+                }
+            }
+
+            top->_outs.clear();
         }
     }
 
@@ -228,5 +250,7 @@ struct Toposort
 
     std::vector<T> _cycle;
 };
+
+} // end cosche namespace
 
 #endif // end __TOPOSORT_H__

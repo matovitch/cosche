@@ -9,6 +9,9 @@
 #include "abstract_task.hpp"
 #include "scheduler.hpp"
 
+namespace cosche
+{
+
 template<class Rt>
 class Task : public AbstractTask
 {
@@ -46,5 +49,6 @@ private:
     std::shared_ptr<std::packaged_task<Rt()>> _task;
 };
 
+} // end cosche namespace
 
 #endif // __TASK_H__

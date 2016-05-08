@@ -9,6 +9,9 @@
 #include "abstract_future.hpp"
 #include "scheduler.hpp"
 
+namespace cosche
+{
+
 class AbstractTask;
 
 typedef boost::context::execution_context<AbstractTask*> Context;
@@ -30,9 +33,11 @@ public:
 
     virtual std::size_t id() const = 0;
 
+    void attach(AbstractTask& task);
+
     void detach(AbstractTask& task);
 
-    void attach(AbstractTask& task);
+    void release();
 
     template <class T>
     T wait(std::future<T>&& future)
@@ -56,5 +61,7 @@ private:
     std::shared_ptr<Context> _context;
     Scheduler& _scheduler;
 };
+
+} // end cosche namespace
 
 #endif // __ABSTRACT_TASK_H__

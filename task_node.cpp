@@ -2,6 +2,9 @@
 
 #include "abstract_task.hpp"
 
+namespace cosche
+{
+
 bool operator==(const TaskNode& lhs,
                 const TaskNode& rhs)
 {
@@ -21,4 +24,6 @@ std::size_t TaskNodeHasher::operator()(const TaskNode& n) const
     hash = (hash ^ (id << 0x18 + id >> 0x08)) * base;
 
     return hash;
+}
+
 }

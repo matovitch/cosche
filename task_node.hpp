@@ -3,6 +3,9 @@
 
 #include <cstddef>
 
+namespace cosche
+{
+
 class AbstractTask;
 
 struct TaskNode
@@ -21,5 +24,7 @@ struct TaskNodeHasher
 {
     std::size_t operator()(const TaskNode& n) const;
 };
+
+} // end cosche namespace
 
 #endif // __TASK_NODE_H__

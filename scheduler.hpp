@@ -7,6 +7,9 @@
 #include "task_node.hpp"
 #include "toposort.hpp"
 
+namespace cosche
+{
+
 class AbstractTask;
 class AbstractFuture;
 
@@ -27,7 +30,7 @@ public:
     {
         _tasks.emplace_back
         (
-            std::make_unique<Task<Rt>>(*this)
+            std::make_shared<Task<Rt>>(*this)
         );
 
         push(_tasks.back().get());
@@ -45,8 +48,10 @@ private:
                            AbstractTask* task);
 
     bool _running;
-    std::vector<std::unique_ptr<AbstractTask>> _tasks;
+    std::vector<std::shared_ptr<AbstractTask>> _tasks;
     std::unordered_map<std::shared_ptr<AbstractFuture>, AbstractTask*> _futures;
 };
+
+} // end cosche namespace
 
 #endif // __SCHEDULER_H__
