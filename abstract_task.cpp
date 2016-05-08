@@ -28,11 +28,6 @@ void AbstractTask::attach(AbstractTask& task)
 
     if (_scheduler._running)
     {
-        if (_scheduler.cyclic())
-        {
-            throw std::exception();
-        }
-        
         *_context = std::get<0>((*_context)(this));
     }
 }
@@ -45,6 +40,14 @@ void AbstractTask::detach(AbstractTask& task)
 void AbstractTask::release()
 {
     _scheduler.release(this);
+}
+
+void AbstractTask::onCycle()
+{
+    if (_onCycle->valid())
+    {
+        _onCycle->operator()();
+    }
 }
 
 } // end cosche namespace

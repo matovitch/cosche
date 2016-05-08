@@ -1,7 +1,9 @@
 #include "scheduler.hpp"
+#include "cycle.hpp"
 #include "task.hpp"
 
 #include <iostream>
+#include <cstdlib>
 #include <future>
 #include <thread>
 #include <chrono>
@@ -54,9 +56,21 @@ int main()
         }
     );
 
+    ping.onCycle([]() { std::cerr << "ping belongs to a cycle" << std::endl; });
+    pong.onCycle([]() { std::cerr << "pong belongs to a cycle" << std::endl; });
+
     pong.attach(ping);
 
-    scheduler.run();
+    try
+    {
+        scheduler.run();
+    }
+    catch (const cosche::Cycle& e)
+    {
+        std::cerr << "The scheduler ended on a cycle !" << "\n";
+        scheduler.onCycle();
+        exit(EXIT_FAILURE);
+    }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -125,11 +125,11 @@ struct Toposort
 
         if (fit != _heap.end())
         {
-            Node<T, H>* const top = &(*(*fit));
+            Node<T, H>* const tNode = &(*(*fit));
 
-            for (Node<T, H>* const out : top->_outs)
+            for (Node<T, H>* const out : tNode->_outs)
             {
-                out->_ins.erase(top);
+                out->_ins.erase(tNode);
 
                 if (out->_ins.empty())
                 {
@@ -138,9 +138,9 @@ struct Toposort
                 }
             }
 
-            _pendings.erase(top);
-            _blockeds.erase(top);
-            _heap.erase(std::make_unique<Node<T, H>>(*top));
+            _pendings.erase(tNode);
+            _blockeds.erase(tNode);
+            _heap.erase(std::make_unique<Node<T, H>>(*tNode));
         }
     }
 
@@ -150,11 +150,11 @@ struct Toposort
 
         if (fit != _heap.end())
         {
-            Node<T, H>* const top = &(*(*fit));
+            Node<T, H>* const tNode = &(*(*fit));
 
-            for (Node<T, H>* const out : top->_outs)
+            for (Node<T, H>* const out : tNode->_outs)
             {
-                out->_ins.erase(top);
+                out->_ins.erase(tNode);
 
                 if (out->_ins.empty() &&
                     _waitings.find(out) == _waitings.end())
@@ -164,7 +164,7 @@ struct Toposort
                 }
             }
 
-            top->_outs.clear();
+            tNode->_outs.clear();
         }
     }
 
@@ -178,11 +178,8 @@ struct Toposort
 
             _waitings.insert(tNode);
 
-            if (tNode->_ins.empty())
-            {
-                _blockeds.insert(tNode);
-                _pendings.erase(tNode);
-            }
+            _blockeds.erase(tNode);
+            _pendings.erase(tNode);
         }
     }
 
@@ -198,8 +195,11 @@ struct Toposort
 
             if (tNode->_ins.empty())
             {
-                _blockeds.erase(tNode);
                 _pendings.insert(tNode);
+            }
+            else
+            {
+                _blockeds.insert(tNode);
             }
         }
     }

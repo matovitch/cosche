@@ -2,7 +2,9 @@
 
 #include "abstract_future.hpp"
 #include "abstract_task.hpp"
+#include "cycle.hpp"
 
+#include <stdexcept>
 #include <utility>
 #include <tuple>
 
@@ -15,7 +17,7 @@ void Scheduler::run()
 
     AbstractTask* task;
 
-    while (!empty() || waiting())
+    while (!cyclic() && (!empty() || waiting()))
     {
         if (!empty())
         {
@@ -26,7 +28,23 @@ void Scheduler::run()
         checkFutures();
     }
 
+    if (cyclic())
+    {
+        throw Cycle();
+    }
+
     _running = false;
+}
+
+void Scheduler::onCycle()
+{
+    if (cyclic())
+    {
+        for (auto& node : cycle())
+        {
+            node._task->onCycle();
+        }
+    }
 }
 
 void Scheduler::checkFutures()

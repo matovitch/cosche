@@ -2,6 +2,7 @@
 #define __TASK_H__
 
 #include <functional>
+#include <iostream>
 #include <utility>
 #include <future>
 #include <tuple>

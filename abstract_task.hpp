@@ -2,6 +2,7 @@
 #define __ABSTRACT_TASK_H__
 
 #include <boost/context/execution_context.hpp>
+#include <iostream>
 #include <utility>
 #include <memory>
 #include <future>
@@ -25,7 +26,15 @@ public:
 
     AbstractTask(Scheduler& scheduler) : 
         _context(std::make_shared<Context>(start)),
-        _scheduler(scheduler) {}
+        _scheduler(scheduler),
+        _onCycle(std::make_shared<std::packaged_task<void()>>
+        (
+            [&]()
+            {
+                std::cerr << "The task " << id() << "belongs to a cycle." << std::endl;
+            }
+        ))
+    {}
 
     AbstractTask(Scheduler&& scheduler) = delete;
 
@@ -38,6 +47,14 @@ public:
     void detach(AbstractTask& task);
 
     void release();
+
+    void onCycle();
+
+    template <class Fn, class... Args>
+    void onCycle(Fn&& fn, Args&&... args)
+    {
+        *_onCycle = std::packaged_task<void()>(std::bind(fn, args...));
+    }
 
     template <class T>
     T wait(std::future<T>&& future)
@@ -60,6 +77,8 @@ private:
     std::shared_ptr<AbstractFuture> _future;
     std::shared_ptr<Context> _context;
     Scheduler& _scheduler;
+
+    std::shared_ptr<std::packaged_task<void()>> _onCycle;
 };
 
 } // end cosche namespace
