@@ -40,8 +40,6 @@ public:
 
     void run();
 
-    void onCycle();
-
 private:
 
     void checkFutures();

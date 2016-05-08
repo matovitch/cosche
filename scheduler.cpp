@@ -30,21 +30,10 @@ void Scheduler::run()
 
     if (cyclic())
     {
-        throw Cycle();
+        throw Cycle(cycle());
     }
 
     _running = false;
-}
-
-void Scheduler::onCycle()
-{
-    if (cyclic())
-    {
-        for (auto& node : cycle())
-        {
-            node._task->onCycle();
-        }
-    }
 }
 
 void Scheduler::checkFutures()

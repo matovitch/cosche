@@ -65,10 +65,12 @@ int main()
     {
         scheduler.run();
     }
-    catch (const cosche::Cycle& e)
+    catch (const cosche::Cycle& cycle)
     {
-        std::cerr << "The scheduler ended on a cycle !" << "\n";
-        scheduler.onCycle();
+        std::cerr << "The scheduler ended on a cycle !" << std::endl;
+
+        cycle();
+
         exit(EXIT_FAILURE);
     }
 
