@@ -22,10 +22,10 @@ std::size_t TaskNodeHasher::operator()(const TaskNode& n) const
     const std::size_t base = 0x00000100000001b3;
     std::size_t hash = 0xcbf29ce484222325;
 
-    hash = (hash ^ (id << 0x00 + id >> 0x20)) * base;
-    hash = (hash ^ (id << 0x08 + id >> 0x18)) * base;
-    hash = (hash ^ (id << 0x10 + id >> 0x10)) * base;
-    hash = (hash ^ (id << 0x18 + id >> 0x08)) * base;
+    hash = (hash ^ ((id << 0x00) + (id >> 0x20))) * base;
+    hash = (hash ^ ((id << 0x08) + (id >> 0x18))) * base;
+    hash = (hash ^ ((id << 0x10) + (id >> 0x10))) * base;
+    hash = (hash ^ ((id << 0x18) + (id >> 0x08))) * base;
 
     return hash;
 }

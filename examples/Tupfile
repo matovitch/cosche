@@ -1,0 +1,10 @@
+include_rules
+
+OBJ = ../*.o ../context/src/*.o ../context/src/posix/*.o 
+
+ASM  = ../context/src/asm/jump_x86_64_sysv_elf_gas.S
+ASM += ../context/src/asm/make_x86_64_sysv_elf_gas.S 
+ASM += ../context/src/asm/ontop_x86_64_sysv_elf_gas.S
+
+: foreach *.cpp |> !cc |> %B.o
+: foreach *.o | $(OBJ) $(ASM) ../context/<context> ../<cosche> |> $(CC) $(CFLAGS) %f $(OBJ) $(ASM) -o %o -pthread |> %B <examples>

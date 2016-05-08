@@ -1,0 +1,19 @@
+ROOT = $(TUP_CWD)
+CC = g++
+
+CFLAGS  =
+CFLAGS += -Wall
+CFLAGS += -pedantic
+CFLAGS += -std=c++14
+
+ifeq (@(TUP_DEBUG),y)
+CFLAGS += -g
+else
+CFLAGS += -O3
+endif
+
+CFLAGS += -I $(ROOT) 
+CFLAGS += -I $(ROOT)/context/include
+CFLAGS += -I $(ROOT)/RobinHoodHashtable
+
+!cc = |> $(CC) $(CFLAGS) -c %f -o %o |> %B.o
