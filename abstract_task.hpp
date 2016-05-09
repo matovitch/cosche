@@ -53,7 +53,6 @@ public:
         catch (...)
         {
             _scheduler._throwing = std::current_exception();
-            *_context = std::get<0>((*_context)(this));
         }
     }
 
