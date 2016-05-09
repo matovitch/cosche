@@ -30,6 +30,8 @@ Context AbstractTask::start(Context context, AbstractTask* task)
 
     task->_scheduler.erase(task);
 
+    task->recycle();
+
     context = std::move(*(task->_context));
 
     return context;
@@ -62,5 +64,7 @@ void AbstractTask::onCycle()
         _onCycle->operator()();
     }
 }
+
+Scheduler& AbstractTask::scheduler() const { return _scheduler; }
 
 } // end cosche namespace

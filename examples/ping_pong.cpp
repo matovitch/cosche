@@ -12,6 +12,8 @@ int main()
 {
     cosche::Scheduler scheduler;
 
+    //scheduler.reserveTasks<void>(2);
+
     auto ping = scheduler.getNewTask<void>();
     auto pong = scheduler.getNewTask<void>();
 
@@ -51,6 +53,7 @@ int main()
         [&]()
         {
             std::cout << "pong" << std::endl;
+            //pong.throwing(std::runtime_error("throw !"));
             ping.detach(pong);
             pong.attach(ping);
             std::cout << "pong" << std::endl;

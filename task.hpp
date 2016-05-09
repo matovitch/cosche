@@ -37,6 +37,12 @@ public:
         }
     }
 
+    void recycle()
+    {
+        _task = std::make_shared<std::packaged_task<Rt()>>();
+        scheduler().recycle(this);
+    }
+
     std::size_t id() const
     {
         return reinterpret_cast<std::size_t>(_task.get());

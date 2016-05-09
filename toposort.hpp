@@ -55,6 +55,8 @@ struct Toposort
         _heap.clear();
         _pendings.clear();
         _blockeds.clear();
+        _waitings.clear();
+        _planneds.clear();
     }
 
     void push(const T& t)
@@ -64,11 +66,27 @@ struct Toposort
         _heap.insert(std::move(node));
     }
 
-    void push(T&& t)
+    void plan(const T& t)
     {
-        std::unique_ptr<Node<T, H>> node(std::make_unique<Node<T, H>>(std::move(t)));
-        _pendings.insert(&(*node));
+        std::unique_ptr<Node<T, H>> node(std::make_unique<Node<T, H>>(T(t)));
+        _planneds.insert(&(*node));
         _heap.insert(std::move(node));
+    }
+
+    void use(const T& t)
+    {
+        auto fit = _heap.find(std::make_unique<Node<T, H>>(t));
+
+        if (fit != _heap.end())
+        {
+            Node<T, H>* const tNode = &(*(*fit));
+
+            if (_planneds.find(tNode) != _planneds.end())
+            {
+                _planneds.erase(tNode);
+                _pendings.insert(tNode);
+            }
+        }
     }
 
     void detach(const T& lhs,
@@ -80,8 +98,8 @@ struct Toposort
         if (lfit != _heap.end() &&
             rfit != _heap.end())
         {
-            Node<T, H>* lhsNode = &(*(*lfit));
-            Node<T, H>* rhsNode = &(*(*rfit));
+            Node<T, H>* const lhsNode = &(*(*lfit));
+            Node<T, H>* const rhsNode = &(*(*rfit));
 
             lhsNode->_ins.erase(rhsNode);
             rhsNode->_outs.erase(lhsNode);
@@ -104,8 +122,8 @@ struct Toposort
         if (lfit != _heap.end() &&
             rfit != _heap.end())
         {
-            Node<T, H>* lhsNode = &(*(*lfit));
-            Node<T, H>* rhsNode = &(*(*rfit));
+            Node<T, H>* const lhsNode = &(*(*lfit));
+            Node<T, H>* const rhsNode = &(*(*rfit));
 
             if (lhsNode->_ins.empty() &&
                 _waitings.find(lhsNode) == _waitings.end())
@@ -140,7 +158,7 @@ struct Toposort
 
             _pendings.erase(tNode);
             _blockeds.erase(tNode);
-            _heap.erase(std::make_unique<Node<T, H>>(*tNode));
+            _planneds.insert(tNode);
         }
     }
 
@@ -174,7 +192,7 @@ struct Toposort
 
         if (fit != _heap.end())
         {
-            Node<T, H>* tNode = &(*(*fit));
+            Node<T, H>* const tNode = &(*(*fit));
 
             _waitings.insert(tNode);
 
@@ -189,7 +207,7 @@ struct Toposort
 
         if (fit != _heap.end())
         {
-            Node<T, H>* tNode = &(*(*fit));
+            Node<T, H>* const tNode = &(*(*fit));
 
             _waitings.erase(tNode);
 
@@ -245,6 +263,7 @@ struct Toposort
     NodePtrSet<Node<T, H>*, H> _pendings;
     NodePtrSet<Node<T, H>*, H> _blockeds;
     NodePtrSet<Node<T, H>*, H> _waitings;
+    NodePtrSet<Node<T, H>*, H> _planneds;
 
     NodePtrSet<std::unique_ptr<Node<T, H>>, H, NodePtrEquals<T, H>> _heap;
 

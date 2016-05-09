@@ -29,6 +29,8 @@ public:
 
     virtual void run() = 0;
 
+    virtual void recycle() = 0;
+
     virtual std::size_t id() const = 0;
 
     void attach(AbstractTask& task);
@@ -38,6 +40,22 @@ public:
     void release();
 
     void onCycle();
+
+    Scheduler& scheduler() const;
+
+    template <class E>
+    void throwing(const E& e)
+    {
+        try
+        {
+            throw e;
+        }
+        catch (...)
+        {
+            _scheduler._throwing = std::current_exception();
+            *_context = std::get<0>((*_context)(this));
+        }
+    }
 
     template <class Fn, class... Args>
     void onCycle(Fn&& fn, Args&&... args)

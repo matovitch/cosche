@@ -19,12 +19,12 @@ void Scheduler::run()
 
     AbstractTask* task;
 
-    while (!cyclic() && (!empty() || waiting()))
+    while (!cyclic() && (!empty() || waiting()) && !_throwing)
     {
         if (!empty())
         {
             task = top()._task;
-            (*task->_context) = std::get<0>((*(task->_context))(task));
+            *(task->_context) = std::get<0>((*(task->_context))(task));
         }
 
         checkFutures();
@@ -33,6 +33,11 @@ void Scheduler::run()
     if (cyclic())
     {
         throw Cycle(cycle());
+    }
+
+    if (_throwing)
+    {
+        std::rethrow_exception(_throwing);
     }
 
     _running = false;
