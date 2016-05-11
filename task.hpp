@@ -42,7 +42,6 @@ public:
 
     void recycle()
     {
-        _task = std::make_shared<std::packaged_task<Rt()>>();
         scheduler().recycle(this);
     }
 
