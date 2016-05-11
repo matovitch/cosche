@@ -22,11 +22,9 @@ public:
     {}
 
     template <class Fn, class... Args>
-    auto operator()(Fn&& fn, Args&&... args)
+    void operator()(Fn&& fn, Args&&... args)
     {
         *_task = std::packaged_task<Rt()>(std::bind(fn, args...));
-
-        return _task->get_future();
     }
 
     void run()
@@ -37,16 +35,18 @@ public:
         }
     }
 
+    std::size_t id() const
+    {
+        return reinterpret_cast<std::size_t>(_task.get());
+    }
+
     void recycle()
     {
         _task = std::make_shared<std::packaged_task<Rt()>>();
         scheduler().recycle(this);
     }
 
-    std::size_t id() const
-    {
-        return reinterpret_cast<std::size_t>(_task.get());
-    }
+    auto getFuture() { return _task->get_future(); }
 
 private:
 

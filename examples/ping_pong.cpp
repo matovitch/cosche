@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <future>
-#include <thread>
 #include <chrono>
 
 int main()
@@ -27,24 +26,21 @@ int main()
             std::cout << "ping" << std::endl;
             ping.release();
 
-            std::packaged_task<void()> task([]()
-            {
-                std::this_thread::sleep_for(std::chrono::seconds(2));
-                std::cout << "task" << std::endl;
-            });
+            // DO NOT use as in does not register
+            // an edge in the dependency graph
+            ping.wait(pong.getFuture());
 
-            auto future = task.get_future();
-
-            std::thread thread(std::move(task));
-
-            ping.attach(pong);
-
-            //ping.wait(std::move(future));
-            ping.waitFor(std::chrono::seconds(1), std::move(future));
+            ping.waitFor(std::chrono::seconds(1),
+                std::async(std::launch::async,
+                    []()
+                    {
+                       std::this_thread::sleep_for(std::chrono::seconds(2));
+                       std::cout << "task" << std::endl;
+                    }
+                )
+            );
 
             std::cout << "ping" << std::endl;
-
-            thread.join();
         }
     );
 
@@ -56,6 +52,7 @@ int main()
             //pong.throwing(std::runtime_error("throw !"));
             ping.detach(pong);
             pong.attach(ping);
+
             std::cout << "pong" << std::endl;
         }
     );
