@@ -26,7 +26,7 @@ int main()
             std::cout << "ping" << std::endl;
             ping.release();
 
-            // DO NOT use as in does not register
+            // DO NOT use as it does not register
             // an edge in the dependency graph
             ping.wait(pong.getFuture());
 
