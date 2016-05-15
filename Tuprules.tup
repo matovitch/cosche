@@ -1,5 +1,5 @@
 ROOT = $(TUP_CWD)
-CC = g++
+CC = g++-5
 
 CFLAGS  =
 CFLAGS += -Wall

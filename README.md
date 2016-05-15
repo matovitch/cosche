@@ -1,4 +1,4 @@
-# cosche
+# cosche [![Build Status](https://travis-ci.org/matovitch/cosche.svg?branch=master)](https://travis-ci.org/matovitch/cosche)
 
 >*Disclaimer:* This is an omega version using a greek modulo versioning (the next iteration may be an alpha ;-)) ! I wouldn't recommend using it for anything else than a toy project. Furthermore, this is my first project in this realm of concurrency so I have probably done some huge mistakes and will gladly accept any reviews and feedbacks.
 
@@ -83,7 +83,7 @@ catch (const cosche::Cycle& cycle)
 }
 ```
 
-The output of the obove program will be
+The output of the above program will be
 ```
 ping
 pong
