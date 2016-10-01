@@ -35,8 +35,7 @@ struct ScopedFuture : std::future<T>, AbstractFuture
 
     bool ready() const
     {
-        return std::future<T>::wait_for  (std::chrono::seconds(0)) == std::future_status::ready ||
-               std::chrono::steady_clock::now() > _timeout;
+        return std::future<T>::wait_until(_timeout) != std::future_status::deferred;
     }
 
     const std::chrono::steady_clock::time_point _timeout;
