@@ -1,5 +1,5 @@
 ROOT = $(TUP_CWD)
-CC = g++-5
+CC = clang++
 
 CFLAGS  =
 CFLAGS += -Wall
@@ -9,7 +9,7 @@ CFLAGS += -std=c++14
 ifeq (@(TUP_DEBUG),y)
 CFLAGS += -g
 else
-CFLAGS += -O3
+CFLAGS += -g
 endif
 
 CFLAGS += -I $(ROOT) 

@@ -12,8 +12,8 @@
 namespace cosche
 {
 
-class AbstractTask;
-class AbstractFuture;
+class  AbstractTask;
+struct AbstractFuture;
 
 template <class Rt>
 class Task;
